@@ -48,5 +48,5 @@ dependencies {
 }
 
 classycle {
-    excludePatterns.set(listOf("org/gradle/api/plugins/quality/internal/*"))
+    excludePatterns.set(["org/gradle/api/plugins/quality/internal/*"])
 }

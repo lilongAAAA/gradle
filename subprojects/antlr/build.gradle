@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2010 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,36 +15,39 @@
  */
 
 plugins {
-    id("gradlebuild.distribution.implementation-kotlin")
+    id("gradlebuild.distribution.api-java")
 }
 
-description = "Kotlin DSL Provider Plugins"
-
 dependencies {
-    implementation(project(":kotlin-dsl"))
-
     implementation(project(":base-services"))
     implementation(project(":logging"))
+    implementation(project(":process-services"))
     implementation(project(":core-api"))
     implementation(project(":model-core"))
     implementation(project(":core"))
-    implementation(project(":file-collections"))
-    implementation(project(":resources"))
     implementation(project(":plugins"))
-    implementation(project(":plugin-development"))
-    implementation(project(":tooling-api"))
-
-    implementation(libs.futureKotlin("scripting-compiler-impl-embeddable")) {
-        isTransitive = false
-    }
+    implementation(project(":workers"))
+    implementation(project(":files"))
 
     implementation(libs.slf4jApi)
+    implementation(libs.groovy)
+    implementation(libs.guava)
     implementation(libs.inject)
 
-    testImplementation(testFixtures(project(":kotlin-dsl")))
-    testImplementation(libs.mockitoKotlin2)
+    compileOnly("antlr:antlr:2.7.7") {
+        because("this dependency is downloaded by the antlr plugin")
+    }
+
+    testImplementation(project(":base-services-groovy"))
+    testImplementation(project(":file-collections"))
+    testImplementation(testFixtures(project(":core")))
+
+    testRuntimeOnly(project(":distributions-core")) {
+        because("ProjectBuilder tests load services from a Gradle distribution.")
+    }
+    integTestDistributionRuntimeOnly(project(":distributions-full"))
 }
 
 classycle {
-    excludePatterns.set(listOf("org/gradle/kotlin/dsl/provider/plugins/precompiled/tasks/**"))
+    excludePatterns.set(["org/gradle/api/plugins/antlr/internal/*"])
 }

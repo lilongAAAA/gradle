@@ -58,5 +58,5 @@ strictCompile {
 
 classycle {
     // Some cycles have been inherited from the time these classes were in :core
-    excludePatterns.set(listOf("org/gradle/api/internal/file/collections/"))
+    excludePatterns.set(["org/gradle/api/internal/file/collections/"])
 }

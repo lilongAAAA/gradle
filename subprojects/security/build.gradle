@@ -49,5 +49,5 @@ dependencies {
 }
 
 classycle {
-    excludePatterns.set(listOf("org/gradle/plugins/signing/type/pgp/**"))
+    excludePatterns.set(["org/gradle/plugins/signing/type/pgp/**"])
 }

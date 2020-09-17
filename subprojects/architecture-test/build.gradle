@@ -20,6 +20,6 @@ tasks.test {
     // Looks like loading all the classes requires more than the default 512M
     maxHeapSize = "700M"
 
-    systemProperty("org.gradle.public.api.includes", PublicApi.includes.joinToString(":"))
-    systemProperty("org.gradle.public.api.excludes", PublicApi.excludes.joinToString(":"))
+    systemProperty("org.gradle.public.api.includes", String.join(":", PublicApi.includes))
+    systemProperty("org.gradle.public.api.excludes", String.join(":", PublicApi.excludes))
 }

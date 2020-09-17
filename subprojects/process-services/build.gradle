@@ -23,5 +23,5 @@ dependencies {
 }
 
 classycle {
-    excludePatterns.set(listOf("org/gradle/process/internal/**"))
+    excludePatterns.set(["org/gradle/process/internal/**"])
 }

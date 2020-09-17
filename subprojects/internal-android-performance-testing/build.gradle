@@ -1,6 +1,6 @@
 plugins {
     id("gradlebuild.internal.java")
-    application
+    id("application")
 }
 
 repositories {
@@ -18,8 +18,8 @@ application {
     applicationName = "android-test-app"
 }
 
-listOf(tasks.distZip, tasks.distTar).forEach {
-    it { archiveBaseName.set("android-test-app") }
+[tasks.distZip, tasks.distTar].each {
+    it.archiveBaseName.set("android-test-app")
 }
 
 tasks.register("buildDists") {

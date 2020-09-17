@@ -50,5 +50,5 @@ strictCompile {
 }
 
 classycle {
-    excludePatterns.set(listOf("org/gradle/plugins/ear/internal/*"))
+    excludePatterns.set(["org/gradle/plugins/ear/internal/*"])
 }

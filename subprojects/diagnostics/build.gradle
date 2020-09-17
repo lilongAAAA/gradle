@@ -61,10 +61,10 @@ dependencies {
 }
 
 classycle {
-    excludePatterns.set(listOf(
+    excludePatterns.set([
         "org/gradle/api/reporting/model/internal/*",
         "org/gradle/api/reporting/dependencies/internal/*",
-        "org/gradle/api/plugins/internal/*"))
+        "org/gradle/api/plugins/internal/*"])
 }
 
 testFilesCleanup {

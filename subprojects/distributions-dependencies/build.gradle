@@ -27,21 +27,21 @@ plugins {
     id("gradlebuild.platform")
 }
 
-val aetherVersion = "1.13.1"
-val antVersion = "1.10.8"
-val archunitVersion = "0.11.0"
-val asmVersion = "7.3.1"
-val awsS3Version = "1.11.633"
-val bouncycastleVersion = "1.64"
-val googleApiVersion = "1.25.0"
-val jacksonVersion = "2.10.2"
-val jettyVersion = "9.4.31.v20200723"
-val mavenVersion = "3.0.5"
-val mavenWagonVersion = "3.0.0"
-val nativePlatformVersion = "0.22-milestone-8"
-val pmavenVersion = "0.8-20100325"
-val slf4jVersion = "1.7.28"
-val sshdVersion = "2.0.0"
+def aetherVersion = "1.13.1"
+def antVersion = "1.10.8"
+def archunitVersion = "0.11.0"
+def asmVersion = "7.3.1"
+def awsS3Version = "1.11.633"
+def bouncycastleVersion = "1.64"
+def googleApiVersion = "1.25.0"
+def jacksonVersion = "2.10.2"
+def jettyVersion = "9.4.31.v20200723"
+def mavenVersion = "3.0.5"
+def mavenWagonVersion = "3.0.0"
+def nativePlatformVersion = "0.22-milestone-8"
+def pmavenVersion = "0.8-20100325"
+def slf4jVersion = "1.7.28"
+def sshdVersion = "2.0.0"
 
 dependencies {
     constraints {

@@ -50,25 +50,25 @@ dependencies {
     implementation(libs.inject)
 
     implementation(libs.futureKotlin("scripting-common")) {
-        isTransitive = false
+        transitive = false
     }
     implementation(libs.futureKotlin("scripting-jvm")) {
-        isTransitive = false
+        transitive = false
     }
     implementation(libs.futureKotlin("scripting-jvm-host-embeddable")) {
-        isTransitive = false
+        transitive = false
     }
     implementation(libs.futureKotlin("scripting-compiler-embeddable")) {
-        isTransitive = false
+        transitive = false
     }
     implementation(libs.futureKotlin("scripting-compiler-impl-embeddable")) {
-        isTransitive = false
+        transitive = false
     }
     implementation(libs.futureKotlin("sam-with-receiver-compiler-plugin")) {
-        isTransitive = false
+        transitive = false
     }
     implementation("org.jetbrains.kotlinx:kotlinx-metadata-jvm:0.1.0") {
-        isTransitive = false
+        transitive = false
     }
 
     testImplementation(project(":build-cache-http"))
@@ -117,7 +117,7 @@ dependencies {
 }
 
 classycle {
-    excludePatterns.set(listOf("org/gradle/kotlin/dsl/**"))
+    excludePatterns.set(["org/gradle/kotlin/dsl/**"])
 }
 
 testFilesCleanup {

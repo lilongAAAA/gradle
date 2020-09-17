@@ -161,7 +161,7 @@ strictCompile {
 }
 
 classycle {
-    excludePatterns.set(listOf("org/gradle/**"))
+    excludePatterns.set(["org/gradle/**"])
 }
 
 tasks.test {
@@ -169,7 +169,7 @@ tasks.test {
 }
 
 tasks.compileTestGroovy {
-    groovyOptions.fork("memoryInitialSize" to "128M", "memoryMaximumSize" to "1G")
+    groovyOptions.fork(["memoryInitialSize": "128M", "memoryMaximumSize": "1G"])
 }
 
 testFilesCleanup {

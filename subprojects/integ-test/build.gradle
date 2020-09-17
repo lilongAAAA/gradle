@@ -22,8 +22,8 @@ dependencies {
     integTestImplementation(libs.jsoup)
 
     integTestImplementation(libs.sampleCheck) {
-        exclude(group = "org.codehaus.groovy", module = "groovy-all")
-        exclude(module = "slf4j-simple")
+        exclude(group: "org.codehaus.groovy", module: "groovy-all")
+        exclude(module: "slf4j-simple")
     }
 
     crossVersionTestImplementation(project(":base-services"))

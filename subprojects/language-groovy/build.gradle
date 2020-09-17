@@ -43,8 +43,8 @@ dependencies {
 }
 
 classycle {
-    excludePatterns.set(listOf(
+    excludePatterns.set([
         "org/gradle/api/internal/tasks/compile/**",
         "org/gradle/api/tasks/javadoc/**"
-    ))
+    ])
 }

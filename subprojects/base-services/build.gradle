@@ -34,6 +34,6 @@ dependencies {
     jmh(libs.guava)
 }
 
-jmh.include = listOf("HashingAlgorithmsBenchmark")
+jmh.include = ["HashingAlgorithmsBenchmark"]
 
 moduleIdentity.createBuildReceipt()
