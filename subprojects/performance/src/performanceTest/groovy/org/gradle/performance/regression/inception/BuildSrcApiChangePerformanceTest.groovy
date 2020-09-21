@@ -21,7 +21,6 @@ import org.gradle.profiler.BuildContext
 import org.gradle.profiler.BuildMutator
 import org.gradle.util.GradleVersion
 import org.junit.experimental.categories.Category
-import spock.lang.Issue
 import spock.lang.Unroll
 
 import static org.gradle.integtests.fixtures.RepoScriptBlockUtil.createMirrorInitScript
@@ -31,7 +30,6 @@ import static org.gradle.performance.generator.JavaTestProject.LARGE_JAVA_MULTI_
 import static org.gradle.performance.generator.JavaTestProject.MEDIUM_MONOLITHIC_JAVA_PROJECT
 import static org.gradle.test.fixtures.server.http.MavenHttpPluginRepository.PLUGIN_PORTAL_OVERRIDE_URL_PROPERTY
 
-@Issue('https://github.com/gradle/gradle-private/issues/1313')
 @Category(SlowPerformanceRegressionTest)
 class BuildSrcApiChangePerformanceTest extends AbstractCrossVersionPerformanceTest {
 
@@ -57,12 +55,11 @@ class BuildSrcApiChangePerformanceTest extends AbstractCrossVersionPerformanceTe
         runner.args = extraGradleBuildArguments()
 
         and:
-        def changingClassFilePath = "buildSrc/${buildSrcProjectDir}src/main/groovy/ChangingClass.groovy"
         runner.addBuildMutator { invocationSettings ->
             new BuildMutator() {
                 @Override
                 void beforeBuild(BuildContext context) {
-                    new File(invocationSettings.projectDir, changingClassFilePath).tap {
+                    new File(invocationSettings.projectDir, "buildSrc/src/main/groovy/ChangingClass.groovy").tap {
                         parentFile.mkdirs()
                         text = """
                         class ChangingClass {
@@ -81,9 +78,9 @@ class BuildSrcApiChangePerformanceTest extends AbstractCrossVersionPerformanceTe
         result.assertCurrentVersionHasNotRegressed()
 
         where:
-        testProject                         | buildSrcProjectDir | runs
-        MEDIUM_MONOLITHIC_JAVA_PROJECT      | ""                 | 40
-        LARGE_JAVA_MULTI_PROJECT            | ""                 | 20
-        LARGE_JAVA_MULTI_PROJECT_KOTLIN_DSL | ""                 | 10
+        testProject                         | runs
+        MEDIUM_MONOLITHIC_JAVA_PROJECT      | 40
+        LARGE_JAVA_MULTI_PROJECT            | 20
+        LARGE_JAVA_MULTI_PROJECT_KOTLIN_DSL | 10
     }
 }
