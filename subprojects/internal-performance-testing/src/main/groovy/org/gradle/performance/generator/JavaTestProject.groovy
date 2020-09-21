@@ -45,6 +45,15 @@ enum JavaTestProject {
         .withCompilerMemory('512m')
         .assembleChangeFile()
         .testChangeFile(450, 2250, 45000).create()),
+    LARGE_JAVA_MULTI_PROJECT_KOTLIN_DSL(new TestProjectGeneratorConfigurationBuilder("largeJavaMultiProjectKotlinDsl", "largeJavaMultiProject")
+        .withSourceFiles(100)
+        .withSubProjects(500)
+        .withDaemonMemory('1536m')
+        .withCompilerMemory('256m')
+        .assembleChangeFile()
+        .testChangeFile(450, 2250, 45000)
+        .withDsl(KOTLIN)
+        .create()),
     LARGE_MONOLITHIC_GROOVY_PROJECT(new TestProjectGeneratorConfigurationBuilder("largeMonolithicGroovyProject", Language.GROOVY)
         .withSourceFiles(50000)
         .withSubProjects(0)
@@ -74,16 +83,6 @@ enum JavaTestProject {
             .testChangeFile(450, 2250, 45000)
             .create()
     ),
-    LARGE_JAVA_MULTI_PROJECT_KOTLIN_DSL(new TestProjectGeneratorConfigurationBuilder("largeJavaMultiProjectKotlinDsl", "largeJavaMultiProject")
-        .withSourceFiles(100)
-        .withSubProjects(500)
-        .withDaemonMemory('1536m')
-        .withCompilerMemory('256m')
-        .assembleChangeFile()
-        .testChangeFile(450, 2250, 45000)
-        .withDsl(KOTLIN)
-        .create()),
-
     MEDIUM_MONOLITHIC_JAVA_PROJECT(new TestProjectGeneratorConfigurationBuilder("mediumMonolithicJavaProject")
         .withSourceFiles(10000)
         .withSubProjects(0)
