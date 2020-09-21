@@ -21,14 +21,93 @@ import org.gradle.performance.measure.Amount
 import org.gradle.performance.measure.MeasuredOperation
 import org.gradle.performance.results.BaselineVersion
 import org.gradle.performance.results.CrossBuildPerformanceResults
+import org.gradle.profiler.BuildContext
+import org.gradle.profiler.BuildMutator
+import org.gradle.profiler.InvocationSettings
 import org.junit.experimental.categories.Category
 import spock.lang.Unroll
 
+import java.util.function.Function
+
 import static org.gradle.performance.generator.JavaTestProject.LARGE_JAVA_MULTI_PROJECT
 import static org.gradle.performance.generator.JavaTestProject.LARGE_JAVA_MULTI_PROJECT_KOTLIN_DSL
+import static org.gradle.performance.generator.JavaTestProject.SMALL_JAVA_MULTI_PROJECT
+import static org.gradle.performance.generator.JavaTestProject.SMALL_JAVA_MULTI_PROJECT_KOTLIN_DSL
 
 @Category(PerformanceRegressionTest)
 class KotlinDslVsGroovyDslPerformanceTest extends AbstractCrossBuildPerformanceTest {
+
+    def buildSrcMutator = new Function<InvocationSettings, BuildMutator>() {
+        @Override
+        BuildMutator apply(InvocationSettings invocationSettings) {
+            return new BuildMutator() {
+                @Override
+                void beforeBuild(BuildContext context) {
+                    new File(invocationSettings.projectDir, "buildSrc/src/main/groovy/ChangingClass.groovy").tap {
+                        parentFile.mkdirs()
+                        text = """
+                        class ChangingClass {
+                            void changingMethod${context.phase}${context.iteration}() {}
+                        }
+                    """.stripIndent()
+                    }
+                }
+            }
+        }
+    }
+
+    @Unroll
+    def "build script compilation #kotlinProject vs. #groovyProject"() {
+        given:
+        runner.testGroup = 'Kotlin DSL vs Groovy DSL'
+        def groovyDslBuildName = 'Groovy_DSL_build_script_compilation'
+        def kotlinDslBuildName = 'Kotlin_DSL_build_script_compilation'
+        def warmupBuilds = 5
+        def measuredBuilds = 10
+
+        runner.baseline {
+            displayName groovyDslBuildName
+            projectName groovyProject.projectName
+            warmUpCount warmupBuilds
+            invocationCount measuredBuilds
+            invocation {
+                gradleOptions = ["-Xms${groovyProject.daemonMemory}", "-Xmx${groovyProject.daemonMemory}"]
+                tasksToRun("help")
+            }
+            addBuildMutator(buildSrcMutator)
+        }
+
+        runner.buildSpec {
+            displayName kotlinDslBuildName
+            projectName kotlinProject.projectName
+            warmUpCount warmupBuilds
+            invocationCount measuredBuilds
+            invocation {
+                gradleOptions = ["-Xms${kotlinProject.daemonMemory}", "-Xmx${kotlinProject.daemonMemory}"]
+                tasksToRun("help")
+            }
+            addBuildMutator(buildSrcMutator)
+        }
+
+        when:
+        def results = runner.run()
+
+        then:
+        def groovyDslResults = buildBaselineResults(results, groovyDslBuildName)
+        def kotlinDslResults = results.buildResult(kotlinDslBuildName)
+        def speedStats = groovyDslResults.getSpeedStatsAgainst(kotlinDslResults.name, kotlinDslResults)
+        println(speedStats)
+
+        def shiftedGroovyResults = buildShiftedResults(results, groovyDslBuildName, regressionToleranceMargin)
+        if (shiftedGroovyResults.significantlyFasterThan(kotlinDslResults)) {
+            throw new AssertionError(speedStats)
+        }
+
+        where:
+        kotlinProject                       | groovyProject            | regressionToleranceMargin
+        SMALL_JAVA_MULTI_PROJECT_KOTLIN_DSL | SMALL_JAVA_MULTI_PROJECT | 70
+        LARGE_JAVA_MULTI_PROJECT_KOTLIN_DSL | LARGE_JAVA_MULTI_PROJECT | 500
+    }
 
     @Unroll
     def "help on #kotlinProject vs. help on #groovyProject"() {
@@ -39,8 +118,8 @@ class KotlinDslVsGroovyDslPerformanceTest extends AbstractCrossBuildPerformanceT
         def kotlinDslBuildName = 'Kotlin_DSL_build'
 
         and:
-        def warmupBuilds = 1
-        def measuredBuilds = 1
+        def warmupBuilds = 5
+        def measuredBuilds = 10
 
         and:
         runner.baseline {
@@ -96,10 +175,7 @@ class KotlinDslVsGroovyDslPerformanceTest extends AbstractCrossBuildPerformanceT
     }
 
     // TODO rebaseline overtime, remove when reaching 0
-
-    private static int medianPercentageShift = 15
-
-    private static BaselineVersion buildShiftedResults(CrossBuildPerformanceResults results, String name) {
+    private static BaselineVersion buildShiftedResults(CrossBuildPerformanceResults results, String name, int medianPercentageShift = 15) {
         def baselineResults = new BaselineVersion(name)
         baselineResults.results.name = name
         def rawResults = results.buildResult(name)
