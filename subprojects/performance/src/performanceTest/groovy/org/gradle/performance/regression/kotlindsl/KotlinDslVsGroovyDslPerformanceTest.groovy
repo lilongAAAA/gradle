@@ -19,6 +19,7 @@ import org.gradle.performance.AbstractCrossBuildPerformanceTest
 import org.gradle.performance.categories.PerformanceRegressionTest
 import org.gradle.performance.measure.Amount
 import org.gradle.performance.measure.MeasuredOperation
+import org.gradle.performance.regression.inception.BuildSrcMutator
 import org.gradle.performance.results.BaselineVersion
 import org.gradle.performance.results.CrossBuildPerformanceResults
 import org.gradle.profiler.BuildContext
@@ -39,25 +40,6 @@ import static org.gradle.performance.generator.JavaTestProject.SMALL_JAVA_MULTI_
 @Category(PerformanceRegressionTest)
 class KotlinDslVsGroovyDslPerformanceTest extends AbstractCrossBuildPerformanceTest {
 
-    def buildSrcMutator = new Function<InvocationSettings, BuildMutator>() {
-        @Override
-        BuildMutator apply(InvocationSettings invocationSettings) {
-            return new BuildMutator() {
-                @Override
-                void beforeBuild(BuildContext context) {
-                    new File(invocationSettings.projectDir, "buildSrc/src/main/groovy/ChangingClass.groovy").tap {
-                        parentFile.mkdirs()
-                        text = """
-                        class ChangingClass {
-                            void changingMethod${context.phase}${context.iteration}() {}
-                        }
-                    """.stripIndent()
-                    }
-                }
-            }
-        }
-    }
-
     @Unroll
     def "build script compilation #kotlinProject vs. #groovyProject"() {
         given:
@@ -66,6 +48,7 @@ class KotlinDslVsGroovyDslPerformanceTest extends AbstractCrossBuildPerformanceT
         def kotlinDslBuildName = 'Kotlin_DSL_build_script_compilation'
         def warmupBuilds = 5
         def measuredBuilds = 10
+        def buildSrcMutator = new BuildSrcMutator()
 
         runner.baseline {
             displayName groovyDslBuildName

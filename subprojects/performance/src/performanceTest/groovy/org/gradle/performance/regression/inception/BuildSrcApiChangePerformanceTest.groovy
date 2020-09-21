@@ -53,23 +53,10 @@ class BuildSrcApiChangePerformanceTest extends AbstractCrossVersionPerformanceTe
         runner.tasksToRun = ['help']
         runner.runs = runs
         runner.args = extraGradleBuildArguments()
+        def buildSrcMutator = new BuildSrcMutator()
 
         and:
-        runner.addBuildMutator { invocationSettings ->
-            new BuildMutator() {
-                @Override
-                void beforeBuild(BuildContext context) {
-                    new File(invocationSettings.projectDir, "buildSrc/src/main/groovy/ChangingClass.groovy").tap {
-                        parentFile.mkdirs()
-                        text = """
-                        class ChangingClass {
-                            void changingMethod${context.phase}${context.iteration}() {}
-                        }
-                    """.stripIndent()
-                    }
-                }
-            }
-        }
+        runner.addBuildMutator(buildSrcMutator)
 
         when:
         def result = runner.run()
