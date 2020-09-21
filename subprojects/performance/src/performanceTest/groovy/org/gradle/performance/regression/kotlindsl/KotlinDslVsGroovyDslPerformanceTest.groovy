@@ -106,7 +106,7 @@ class KotlinDslVsGroovyDslPerformanceTest extends AbstractCrossBuildPerformanceT
         where:
         kotlinProject                       | groovyProject            | regressionToleranceMargin
         SMALL_JAVA_MULTI_PROJECT_KOTLIN_DSL | SMALL_JAVA_MULTI_PROJECT | 70
-        LARGE_JAVA_MULTI_PROJECT_KOTLIN_DSL | LARGE_JAVA_MULTI_PROJECT | 500
+        LARGE_JAVA_MULTI_PROJECT_KOTLIN_DSL | LARGE_JAVA_MULTI_PROJECT | 600
     }
 
     @Unroll
