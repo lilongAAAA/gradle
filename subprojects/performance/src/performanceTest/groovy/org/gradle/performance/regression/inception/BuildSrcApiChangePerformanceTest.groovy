@@ -21,17 +21,17 @@ import org.gradle.profiler.BuildContext
 import org.gradle.profiler.BuildMutator
 import org.gradle.util.GradleVersion
 import org.junit.experimental.categories.Category
-import spock.lang.Issue
 import spock.lang.Unroll
 
 import static org.gradle.integtests.fixtures.RepoScriptBlockUtil.createMirrorInitScript
 import static org.gradle.integtests.fixtures.RepoScriptBlockUtil.gradlePluginRepositoryMirrorUrl
 import static org.gradle.performance.generator.JavaTestProject.LARGE_JAVA_MULTI_PROJECT
 import static org.gradle.performance.generator.JavaTestProject.LARGE_JAVA_MULTI_PROJECT_KOTLIN_DSL
+import static org.gradle.performance.generator.JavaTestProject.LARGE_JAVA_MULTI_PROJECT_WITH_PLUGINS_BLOCKS
+import static org.gradle.performance.generator.JavaTestProject.LARGE_JAVA_MULTI_PROJECT_WITH_PLUGINS_BLOCKS_KOTLIN_DSL
 import static org.gradle.performance.generator.JavaTestProject.MEDIUM_MONOLITHIC_JAVA_PROJECT
 import static org.gradle.test.fixtures.server.http.MavenHttpPluginRepository.PLUGIN_PORTAL_OVERRIDE_URL_PROPERTY
 
-@Issue('https://github.com/gradle/gradle-private/issues/1313')
 @Category(SlowPerformanceRegressionTest)
 class BuildSrcApiChangePerformanceTest extends AbstractCrossVersionPerformanceTest {
 
@@ -53,11 +53,12 @@ class BuildSrcApiChangePerformanceTest extends AbstractCrossVersionPerformanceTe
         given:
         runner.testProject = testProject
         runner.tasksToRun = ['help']
+        runner.warmUpRuns = warmUpRuns
         runner.runs = runs
         runner.args = extraGradleBuildArguments()
 
         and:
-        def changingClassFilePath = "buildSrc/${buildSrcProjectDir}src/main/groovy/ChangingClass.groovy"
+        def changingClassFilePath = "buildSrc/src/main/groovy/ChangingClass.groovy"
         runner.addBuildMutator { invocationSettings ->
             new BuildMutator() {
                 @Override
@@ -81,9 +82,11 @@ class BuildSrcApiChangePerformanceTest extends AbstractCrossVersionPerformanceTe
         result.assertCurrentVersionHasNotRegressed()
 
         where:
-        testProject                         | buildSrcProjectDir | runs
-        MEDIUM_MONOLITHIC_JAVA_PROJECT      | ""                 | 40
-        LARGE_JAVA_MULTI_PROJECT            | ""                 | 20
-        LARGE_JAVA_MULTI_PROJECT_KOTLIN_DSL | ""                 | 10
+        testProject                                             | warmUpRuns | runs
+        MEDIUM_MONOLITHIC_JAVA_PROJECT                          | 10         | 40
+        LARGE_JAVA_MULTI_PROJECT                                | 10         | 20
+        LARGE_JAVA_MULTI_PROJECT_KOTLIN_DSL                     | 10         | 10
+        LARGE_JAVA_MULTI_PROJECT_WITH_PLUGINS_BLOCKS            | 5          | 10
+        LARGE_JAVA_MULTI_PROJECT_WITH_PLUGINS_BLOCKS_KOTLIN_DSL | 5          | 10
     }
 }

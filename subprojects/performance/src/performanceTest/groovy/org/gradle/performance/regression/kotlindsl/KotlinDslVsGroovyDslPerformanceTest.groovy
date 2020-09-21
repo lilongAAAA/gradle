@@ -21,14 +21,102 @@ import org.gradle.performance.measure.Amount
 import org.gradle.performance.measure.MeasuredOperation
 import org.gradle.performance.results.BaselineVersion
 import org.gradle.performance.results.CrossBuildPerformanceResults
+import org.gradle.profiler.BuildContext
+import org.gradle.profiler.BuildMutator
+import org.gradle.profiler.InvocationSettings
 import org.junit.experimental.categories.Category
 import spock.lang.Unroll
 
+import java.util.function.Function
+
 import static org.gradle.performance.generator.JavaTestProject.LARGE_JAVA_MULTI_PROJECT
 import static org.gradle.performance.generator.JavaTestProject.LARGE_JAVA_MULTI_PROJECT_KOTLIN_DSL
+import static org.gradle.performance.generator.JavaTestProject.LARGE_JAVA_MULTI_PROJECT_WITH_PLUGINS_BLOCKS
+import static org.gradle.performance.generator.JavaTestProject.LARGE_JAVA_MULTI_PROJECT_WITH_PLUGINS_BLOCKS_KOTLIN_DSL
+import static org.gradle.performance.generator.JavaTestProject.SMALL_JAVA_MULTI_PROJECT
+import static org.gradle.performance.generator.JavaTestProject.SMALL_JAVA_MULTI_PROJECT_KOTLIN_DSL
 
 @Category(PerformanceRegressionTest)
 class KotlinDslVsGroovyDslPerformanceTest extends AbstractCrossBuildPerformanceTest {
+
+    def changingClassFilePath = "buildSrc/src/main/groovy/ChangingClass.groovy"
+    def buildSrcMutator = new Function<InvocationSettings, BuildMutator>() {
+        @Override
+        BuildMutator apply(InvocationSettings invocationSettings) {
+            return new BuildMutator() {
+                @Override
+                void beforeBuild(BuildContext context) {
+                    new File(invocationSettings.projectDir, changingClassFilePath).tap {
+                        parentFile.mkdirs()
+                        text = """
+                        class ChangingClass {
+                            void changingMethod${context.phase}${context.iteration}() {}
+                        }
+                    """.stripIndent()
+                    }
+                }
+            }
+        }
+    }
+
+    @Unroll
+    def "buildSrc api change in #kotlinProject vs. #groovyProject"() {
+        given:
+        runner.testGroup = 'Kotlin DSL vs Groovy DSL'
+        def groovyDslBuildName = 'Groovy_DSL_build'
+        def kotlinDslBuildName = 'Kotlin_DSL_build'
+        def warmupBuilds = 5
+        def measuredBuilds = 5
+
+        and:
+        runner.baseline {
+            displayName groovyDslBuildName
+            projectName groovyProject.projectName
+            warmUpCount warmupBuilds
+            invocationCount measuredBuilds
+            invocation {
+                gradleOptions = ["-Xms${groovyProject.daemonMemory}", "-Xmx${groovyProject.daemonMemory}"]
+                tasksToRun("help")
+            }
+            addBuildMutator(buildSrcMutator)
+        }
+
+        and:
+        runner.buildSpec {
+            displayName kotlinDslBuildName
+            projectName kotlinProject.projectName
+            warmUpCount warmupBuilds
+            invocationCount measuredBuilds
+            invocation {
+                gradleOptions = ["-Xms${kotlinProject.daemonMemory}", "-Xmx${kotlinProject.daemonMemory}"]
+                tasksToRun("help")
+            }
+            addBuildMutator(buildSrcMutator)
+        }
+
+        when:
+        def results = runner.run()
+
+        then:
+        def groovyDslResults = buildBaselineResults(results, groovyDslBuildName)
+        def kotlinDslResults = results.buildResult(kotlinDslBuildName)
+
+        then:
+        def speedStats = groovyDslResults.getSpeedStatsAgainst(kotlinDslResults.name, kotlinDslResults)
+        println(speedStats)
+
+        and:
+        def shiftedGroovyResults = buildShiftedResults(results, groovyDslBuildName)
+        if (shiftedGroovyResults.significantlyFasterThan(kotlinDslResults)) {
+            throw new AssertionError(speedStats)
+        }
+
+        where:
+        kotlinProject                                           | groovyProject
+        SMALL_JAVA_MULTI_PROJECT_KOTLIN_DSL                     | SMALL_JAVA_MULTI_PROJECT
+        LARGE_JAVA_MULTI_PROJECT_KOTLIN_DSL                     | LARGE_JAVA_MULTI_PROJECT
+        LARGE_JAVA_MULTI_PROJECT_WITH_PLUGINS_BLOCKS_KOTLIN_DSL | LARGE_JAVA_MULTI_PROJECT_WITH_PLUGINS_BLOCKS
+    }
 
     @Unroll
     def "help on #kotlinProject vs. help on #groovyProject"() {

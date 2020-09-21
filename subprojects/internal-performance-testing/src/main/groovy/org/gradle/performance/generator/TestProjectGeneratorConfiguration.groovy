@@ -38,6 +38,7 @@ class TestProjectGeneratorConfiguration {
     String[] externalImplementationDependencies
 
     boolean buildSrc
+    boolean pluginsBlocks
 
     int subProjects
     int sourceFiles
@@ -83,6 +84,7 @@ class TestProjectGeneratorConfigurationBuilder {
         this.language = language
         this.dsl = GradleDsl.GROOVY
         this.buildSrc = true
+        this.pluginsBlocks = false
         this.fileToChangeByScenario = [:]
         this.systemProperties = [:]
         this.featurePreviews = [] as String[]
@@ -119,6 +121,7 @@ class TestProjectGeneratorConfigurationBuilder {
         config.language = this.language
         config.dsl = this.dsl
         config.buildSrc = this.buildSrc
+        config.pluginsBlocks = this.pluginsBlocks
 
         config.plugins = this.language == Language.GROOVY ? ['groovy', 'java', 'eclipse', 'idea'] : ['java', 'eclipse', 'idea']
         config.repositories = [mavenCentralRepositoryDefinition(this.dsl)]

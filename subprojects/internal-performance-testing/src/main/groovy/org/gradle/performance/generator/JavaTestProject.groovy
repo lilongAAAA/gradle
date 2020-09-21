@@ -130,13 +130,38 @@ enum JavaTestProject {
         .withCompilerMemory("64m")
         .assembleChangeFile()
         .create()),
+    SMALL_JAVA_MULTI_PROJECT_KOTLIN_DSL(new TestProjectGeneratorConfigurationBuilder("smallJavaMultiProjectKotlinDsl")
+        .withSourceFiles(50)
+        .withSubProjects(10)
+        .withDaemonMemory("256m")
+        .withCompilerMemory("64m")
+        .assembleChangeFile()
+        .withDsl(KOTLIN)
+        .create()),
     SMALL_JAVA_MULTI_PROJECT_NO_BUILD_SRC(new TestProjectGeneratorConfigurationBuilder('smallJavaMultiProjectNoBuildSrc')
         .withSourceFiles(50)
         .withSubProjects(10)
         .withDaemonMemory("256m")
         .withCompilerMemory("64m")
         .assembleChangeFile()
-        .withBuildSrc(false).create())
+        .withBuildSrc(false).create()),
+    LARGE_JAVA_MULTI_PROJECT_WITH_PLUGINS_BLOCKS(new TestProjectGeneratorConfigurationBuilder("largeJavaMultiProjectWithPluginsBlocks")
+        .withSourceFiles(100)
+        .withSubProjects(500)
+        .withDaemonMemory('1536m')
+        .withCompilerMemory('512m')
+        .withPluginsBlocks(true)
+        .assembleChangeFile()
+        .testChangeFile(450, 2250, 45000).create()),
+    LARGE_JAVA_MULTI_PROJECT_WITH_PLUGINS_BLOCKS_KOTLIN_DSL(new TestProjectGeneratorConfigurationBuilder("largeJavaMultiProjectWithPluginsBlocksKotlinDsl")
+        .withSourceFiles(100)
+        .withSubProjects(500)
+        .withDaemonMemory('1536m')
+        .withCompilerMemory('512m')
+        .withPluginsBlocks(true)
+        .assembleChangeFile()
+        .withDsl(KOTLIN)
+        .testChangeFile(450, 2250, 45000).create())
 
     private TestProjectGeneratorConfiguration config
 

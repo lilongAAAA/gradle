@@ -50,12 +50,7 @@ abstract class FileContentGenerator {
             return ""
         }
         return """
-        import org.gradle.util.GradleVersion
-
-        ${missingJavaLibrarySupportFlag()}
-        ${noJavaLibraryPluginFlag()}
-
-        ${config.plugins.collect { decideOnJavaPlugin(it, dependencyTree.hasParentProject(subProjectNumber)) }.join("\n        ")}
+        ${pluginsDeclarations(dependencyTree.hasParentProject(subProjectNumber))}
 
         repositories {
             ${config.repositories.join("\n            ")}
@@ -401,15 +396,32 @@ abstract class FileContentGenerator {
         Math.ceil(config.minLinesOfCodePerSourceFile / 10)
     }
 
-    protected final String decideOnJavaPlugin(String plugin, Boolean projectHasParents) {
+    private String pluginsDeclarations(boolean projectHasParents) {
+        if (config.pluginsBlocks) {
+            return """
+        plugins {
+        ${config.plugins.collect { plugin(it == "java" ? "java-library" : it) }.join("\n        ")}
+        }
+            """
+        }
+        return """
+        import org.gradle.util.GradleVersion
+        ${missingJavaLibrarySupportFlag()}
+        ${noJavaLibraryPluginFlag()}
+
+        ${config.plugins.collect { decideOnJavaPlugin(it, projectHasParents) }.join("\n        ")}
+        """
+    }
+
+    protected final String decideOnJavaPlugin(String plugin, boolean projectHasParents) {
         if (plugin.contains('java')) {
             if (projectHasParents) {
                 return """
-                    if (missingJavaLibrarySupport || noJavaLibraryPlugin) {
-                        ${imperativelyApplyPlugin("java")}
-                    } else {
-                        ${imperativelyApplyPlugin("java-library")}
-                    }
+        if (missingJavaLibrarySupport || noJavaLibraryPlugin) {
+            ${imperativelyApplyPlugin("java")}
+        } else {
+            ${imperativelyApplyPlugin("java-library")}
+        }
                 """
             } else {
                 return imperativelyApplyPlugin("java")
@@ -435,6 +447,13 @@ abstract class FileContentGenerator {
 
                     $subProjectDependencies
         """
+        if (config.pluginsBlocks) {
+            return """
+            dependencies {
+                ${block}
+            }
+            """
+        }
         return """
             ${configurationsIfMissingJavaLibrarySupport(hasParent)}
             if (hasProperty("compileConfiguration")) {
@@ -449,7 +468,7 @@ abstract class FileContentGenerator {
         """
     }
 
-    protected final convertToPomDependency(String dependency, String scope = 'compile') {
+    protected static final convertToPomDependency(String dependency, String scope = 'compile') {
         def parts = dependency.split(':')
         def groupId = parts[0]
         def artifactId = parts[1]
@@ -470,6 +489,10 @@ abstract class FileContentGenerator {
     protected abstract String tasksConfiguration()
 
     protected abstract String imperativelyApplyPlugin(String plugin)
+
+    protected static String plugin(String plugin) {
+        return "    id(\"$plugin\")"
+    }
 
     protected abstract String createTaskThatDependsOnAllIncludedBuildsTaskWithSameName(String taskName)
 
