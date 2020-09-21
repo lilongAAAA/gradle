@@ -71,6 +71,7 @@ class CompositeBuildBuildSrcBuildOperationsIntegrationTest extends AbstractCompo
         loadOps[0].displayName == "Load build"
         loadOps[0].details.buildPath == ":"
         loadOps[0].parentId == root.id
+        def loaBuildOp = loadOps[0]
 
         loadOps[1].displayName == "Load build (:buildB)"
         loadOps[1].details.buildPath == ":buildB"
@@ -90,7 +91,7 @@ class CompositeBuildBuildSrcBuildOperationsIntegrationTest extends AbstractCompo
         configureOps[0].parentId == buildSrcOps[0].id
         configureOps[1].displayName == "Configure build (:buildB)"
         configureOps[1].details.buildPath == ":buildB"
-        configureOps[1].parentId == buildTreeOp.id
+        configureOps[1].parentId == loaBuildOp.id
         configureOps[2].displayName == "Configure build"
         configureOps[2].details.buildPath == ":"
         configureOps[2].parentId == buildTreeOp.id
@@ -166,6 +167,7 @@ class CompositeBuildBuildSrcBuildOperationsIntegrationTest extends AbstractCompo
         loadOps[0].displayName == "Load build"
         loadOps[0].details.buildPath == ":"
         loadOps[0].parentId == root.id
+        def loaBuildOp = loadOps[0]
 
         loadOps[1].displayName == "Load build (:buildB)"
         loadOps[1].details.buildPath == ":buildB"
@@ -190,7 +192,7 @@ class CompositeBuildBuildSrcBuildOperationsIntegrationTest extends AbstractCompo
 
         configureOps[1].displayName == "Configure build (:buildB)"
         configureOps[1].details.buildPath == ":buildB"
-        configureOps[1].parentId == buildTreeOp.id
+        configureOps[1].parentId == loaBuildOp.id
 
         configureOps[2].displayName == "Configure build (:buildSrc)"
         configureOps[2].details.buildPath == ":buildSrc"
