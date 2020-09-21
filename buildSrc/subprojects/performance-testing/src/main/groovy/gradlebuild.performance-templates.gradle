@@ -32,7 +32,7 @@ tasks.register("gradleBuildBaseline", RemoteProject) {
 
 // === Java ===
 ['largeMonolithicJavaProject', 'largeJavaMultiProject', 'largeMonolithicGroovyProject', 'largeGroovyMultiProject', 'largeJavaMultiProjectNoBuildSrc', 'largeJavaMultiProjectKotlinDsl',
- 'mediumMonolithicJavaProject', 'mediumJavaMultiProject', 'mediumJavaMultiProjectWithTestNG', 'mediumJavaCompositeBuild', 'mediumJavaPredefinedCompositeBuild',
+ 'mediumMonolithicJavaProject', 'mediumJavaMultiProject', 'mediumJavaMultiProjectKotlinDsl', 'mediumJavaMultiProjectWithTestNG', 'mediumJavaCompositeBuild', 'mediumJavaPredefinedCompositeBuild',
  'smallJavaMultiProject', 'smallJavaMultiProjectKotlinDsl', 'smallJavaMultiProjectNoBuildSrc'].each { template ->
     tasks.register(template, JavaExecProjectGeneratorTask) {
         outputs.dir new File(buildDir, template)

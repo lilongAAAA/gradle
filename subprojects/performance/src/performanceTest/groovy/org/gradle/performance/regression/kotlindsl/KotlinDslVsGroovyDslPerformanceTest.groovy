@@ -31,6 +31,8 @@ import java.util.function.Function
 
 import static org.gradle.performance.generator.JavaTestProject.LARGE_JAVA_MULTI_PROJECT
 import static org.gradle.performance.generator.JavaTestProject.LARGE_JAVA_MULTI_PROJECT_KOTLIN_DSL
+import static org.gradle.performance.generator.JavaTestProject.MEDIUM_JAVA_MULTI_PROJECT
+import static org.gradle.performance.generator.JavaTestProject.MEDIUM_JAVA_MULTI_PROJECT_KOTLIN_DSL
 import static org.gradle.performance.generator.JavaTestProject.SMALL_JAVA_MULTI_PROJECT
 import static org.gradle.performance.generator.JavaTestProject.SMALL_JAVA_MULTI_PROJECT_KOTLIN_DSL
 
@@ -104,9 +106,10 @@ class KotlinDslVsGroovyDslPerformanceTest extends AbstractCrossBuildPerformanceT
         }
 
         where:
-        kotlinProject                       | groovyProject            | regressionToleranceMargin
-        SMALL_JAVA_MULTI_PROJECT_KOTLIN_DSL | SMALL_JAVA_MULTI_PROJECT | 70
-        LARGE_JAVA_MULTI_PROJECT_KOTLIN_DSL | LARGE_JAVA_MULTI_PROJECT | 600
+        kotlinProject                        | groovyProject             | regressionToleranceMargin
+        SMALL_JAVA_MULTI_PROJECT_KOTLIN_DSL  | SMALL_JAVA_MULTI_PROJECT  | 70
+        MEDIUM_JAVA_MULTI_PROJECT_KOTLIN_DSL | MEDIUM_JAVA_MULTI_PROJECT | 350
+        LARGE_JAVA_MULTI_PROJECT_KOTLIN_DSL  | LARGE_JAVA_MULTI_PROJECT  | 600
     }
 
     @Unroll

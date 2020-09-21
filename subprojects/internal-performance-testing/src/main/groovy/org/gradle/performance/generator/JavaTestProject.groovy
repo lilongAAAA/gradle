@@ -98,6 +98,14 @@ enum JavaTestProject {
         .withCompilerMemory('256m')
         .assembleChangeFile()
         .create()),
+    MEDIUM_JAVA_MULTI_PROJECT_KOTLIN_DSL(new TestProjectGeneratorConfigurationBuilder("mediumJavaMultiProjectKotlinDsl")
+        .withSourceFiles(100)
+        .withSubProjects(100)
+        .withDaemonMemory('512m')
+        .withCompilerMemory('256m')
+        .assembleChangeFile()
+        .withDsl(KOTLIN)
+        .create()),
     MEDIUM_JAVA_COMPOSITE_BUILD(new TestProjectGeneratorConfigurationBuilder("mediumJavaCompositeBuild", "mediumJavaMultiProject")
         .withSourceFiles(100)
         .withSubProjects(100)
