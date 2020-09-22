@@ -19,6 +19,7 @@ import org.gradle.api.Project;
 import org.gradle.api.file.DirectoryProperty;
 import org.gradle.api.model.ReplacedBy;
 import org.gradle.api.resources.TextResource;
+import org.gradle.api.resources.TextResourceFactory;
 import org.gradle.internal.deprecation.DeprecationLogger;
 
 import java.io.File;
@@ -32,7 +33,7 @@ import java.util.Map;
  */
 public class CheckstyleExtension extends CodeQualityExtension {
 
-    private final Project project;
+    private final TextResourceFactory textResources;
 
     private TextResource config;
     private Map<String, Object> configProperties = new LinkedHashMap<String, Object>();
@@ -42,7 +43,7 @@ public class CheckstyleExtension extends CodeQualityExtension {
     private final DirectoryProperty configDirectory;
 
     public CheckstyleExtension(Project project) {
-        this.project = project;
+        this.textResources = project.getResources().getText();
         this.configDirectory = project.getObjects().directoryProperty();
     }
 
@@ -57,7 +58,7 @@ public class CheckstyleExtension extends CodeQualityExtension {
      * The Checkstyle configuration file to use.
      */
     public void setConfigFile(File configFile) {
-        setConfig(project.getResources().getText().fromFile(configFile));
+        setConfig(textResources.fromFile(configFile));
     }
 
     /**

@@ -26,7 +26,7 @@ import java.util.Collection;
 public abstract class CodeQualityExtension {
 
     private String toolVersion;
-    private Collection<SourceSet> sourceSets;
+    private transient Collection<SourceSet> sourceSets;
     private boolean ignoreFailures;
     private File reportsDir;
 
