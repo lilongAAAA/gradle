@@ -19,5 +19,13 @@ package org.gradle.integtests.fixtures
 abstract class AbstractSampleIntegrationTest extends AbstractIntegrationSpec {
     def setup() {
         executer.withRepositoryMirrors()
+            // Disable toolchain detection and download - we want to be specific
+            .withArgument("-Porg.gradle.java.installations.auto-detect=false")
+            .withArgument("-Porg.gradle.java.installations.auto-download=false")
+    }
+
+    def configureExecuterForToolchains(String... versions) {
+        def jdks = AvailableJavaHomes.getJdks(versions)
+        executer.withArgument("-Porg.gradle.java.installations.paths=" + jdks.collect { it.javaHome.absolutePath}.join(","))
     }
 }
