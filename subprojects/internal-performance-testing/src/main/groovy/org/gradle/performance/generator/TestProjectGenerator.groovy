@@ -16,6 +16,8 @@
 
 package org.gradle.performance.generator
 
+import org.gradle.test.fixtures.dsl.GradleDsl
+
 class TestProjectGenerator {
 
     TestProjectGeneratorConfiguration config
@@ -53,6 +55,9 @@ class TestProjectGenerator {
         def rootProjectDir = new File(outputBaseDir, config.projectName)
         rootProjectDir.mkdirs()
         generateProject(rootProjectDir, dependencyTree, null)
+        if (config.pluginsBlocks) {
+            generatePluginsInBuildSrc(rootProjectDir)
+        }
         for (int subProjectNumber = 0; subProjectNumber < config.subProjects; subProjectNumber++) {
             def subProjectDir = new File(rootProjectDir, "project$subProjectNumber")
             generateProject(subProjectDir, dependencyTree, subProjectNumber)
@@ -94,7 +99,38 @@ class TestProjectGenerator {
      */
     private addDummyBuildSrcProject(File projectDir) {
         file projectDir, "buildSrc/src/main/${config.language.name}/Thing.${config.language.name}", "public class Thing {}"
-        file projectDir, "buildSrc/build.gradle", "compileJava.options.incremental = true"
+        if (config.pluginsBlocks) {
+            if (config.dsl == GradleDsl.KOTLIN) {
+                file projectDir, "buildSrc/build.gradle.kts", """
+                plugins {
+                    `kotlin-dsl`
+                }
+                repositories {
+                    gradlePluginPortal()
+                }
+                """.stripIndent()
+            } else {
+                file projectDir, "buildSrc/build.gradle", """
+                plugins {
+                    id("gradle-groovy-plugin")
+                }
+                """.stripIndent()
+            }
+        } else {
+            file projectDir, "buildSrc/build.gradle", "compileJava.options.incremental = true"
+        }
+    }
+
+    private generatePluginsInBuildSrc(File rootProjectDir) {
+        for (int subProjectNumber = 0; subProjectNumber < config.subProjects; subProjectNumber++) {
+            generatePluginInBuildSrc(rootProjectDir, subProjectNumber)
+        }
+    }
+
+    private generatePluginInBuildSrc(File rootProjectDir, int subProjectNumber) {
+        String dslDirectory = config.dsl == GradleDsl.KOTLIN ? 'kotlin' : 'groovy'
+        String pluginSuffix = config.dsl == GradleDsl.KOTLIN ? '.gradle.kts' : '.gradle'
+        file rootProjectDir, "buildSrc/src/main/${dslDirectory}/myproject.plugin${subProjectNumber}${pluginSuffix}", "println(\"plugin${subProjectNumber}\")"
     }
 
     void file(File dir, String name, String content) {

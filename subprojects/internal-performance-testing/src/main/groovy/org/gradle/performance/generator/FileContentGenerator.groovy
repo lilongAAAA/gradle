@@ -50,7 +50,7 @@ abstract class FileContentGenerator {
             return ""
         }
         return """
-        ${pluginsDeclarations(dependencyTree.hasParentProject(subProjectNumber))}
+        ${pluginsDeclarations(dependencyTree.hasParentProject(subProjectNumber), subProjectNumber)}
 
         repositories {
             ${config.repositories.join("\n            ")}
@@ -64,7 +64,6 @@ abstract class FileContentGenerator {
         }
             }
         }
-
 
         ${tasksConfiguration()}
 
@@ -396,11 +395,19 @@ abstract class FileContentGenerator {
         Math.ceil(config.minLinesOfCodePerSourceFile / 10)
     }
 
-    private String pluginsDeclarations(boolean projectHasParents) {
+    private String pluginsDeclarations(boolean projectHasParents, Integer subprojectNumber) {
         if (config.pluginsBlocks) {
+            if (subprojectNumber == null) {
+                return """
+        plugins {
+        ${config.plugins.collect { plugin(it == "java" ? "java-library" : it) }.join("\n        ")}
+        }
+            """
+            }
             return """
         plugins {
         ${config.plugins.collect { plugin(it == "java" ? "java-library" : it) }.join("\n        ")}
+            id("myproject.plugin${subprojectNumber}")
         }
             """
         }
