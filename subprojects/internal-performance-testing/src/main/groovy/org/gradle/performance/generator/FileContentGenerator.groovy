@@ -55,6 +55,9 @@ abstract class FileContentGenerator {
         repositories {
             ${config.repositories.join("\n            ")}
         }
+
+        println("project${subProjectNumber}")
+
         ${dependenciesBlock('api', 'implementation', 'testImplementation', subProjectNumber, dependencyTree)}
 
         allprojects {

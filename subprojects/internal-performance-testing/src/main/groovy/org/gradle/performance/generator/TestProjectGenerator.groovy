@@ -112,7 +112,7 @@ class TestProjectGenerator {
             } else {
                 file projectDir, "buildSrc/build.gradle", """
                 plugins {
-                    id("gradle-groovy-plugin")
+                    id("groovy-gradle-plugin")
                 }
                 """.stripIndent()
             }
