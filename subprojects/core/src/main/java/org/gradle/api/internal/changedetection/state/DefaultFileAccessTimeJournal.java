@@ -30,6 +30,8 @@ import org.gradle.util.GUtil;
 
 import java.io.File;
 import java.util.Properties;
+import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.gradle.cache.internal.filelock.LockOptionsBuilder.mode;
 import static org.gradle.internal.serialize.BaseSerializerFactory.FILE_SERIALIZER;
@@ -37,7 +39,9 @@ import static org.gradle.internal.serialize.BaseSerializerFactory.LONG_SERIALIZE
 
 public class DefaultFileAccessTimeJournal implements FileAccessTimeJournal, Stoppable {
 
-    public static final String CACHE_KEY = "journal-1";
+
+    public static String CACHE_KEY = "journal-";
+
     public static final String FILE_ACCESS_CACHE_NAME = "file-access";
     public static final String FILE_ACCESS_PROPERTIES_FILE_NAME = FILE_ACCESS_CACHE_NAME + ".properties";
     public static final String INCEPTION_TIMESTAMP_KEY = "inceptionTimestamp";
@@ -47,8 +51,11 @@ public class DefaultFileAccessTimeJournal implements FileAccessTimeJournal, Stop
     private final long inceptionTimestamp;
 
     public DefaultFileAccessTimeJournal(CacheRepository cacheRepository, InMemoryCacheDecoratorFactory cacheDecoratorFactory) {
+        Random random = new Random();
+        int index = random.nextInt(9)+1;
+        System.err.println("create new DefaultFileAccessTimeJournal for cache index:"+index);
         cache = cacheRepository
-            .cache(CACHE_KEY)
+            .cache(CACHE_KEY+index)
             .withCrossVersionCache(CacheBuilder.LockTarget.CacheDirectory)
             .withDisplayName("journal cache")
             .withLockOptions(mode(FileLockManager.LockMode.None)) // lock on demand
