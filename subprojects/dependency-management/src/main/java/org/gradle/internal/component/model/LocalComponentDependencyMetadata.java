@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableList;
 import org.gradle.api.artifacts.Dependency;
 import org.gradle.api.artifacts.component.ComponentIdentifier;
 import org.gradle.api.artifacts.component.ComponentSelector;
+import org.gradle.api.artifacts.component.ModuleComponentSelector;
 import org.gradle.api.attributes.AttributeContainer;
 import org.gradle.api.capabilities.Capability;
 import org.gradle.api.internal.attributes.AttributeContainerInternal;
@@ -31,9 +32,11 @@ import org.gradle.internal.component.IncompatibleConfigurationSelectionException
 import org.gradle.internal.exceptions.ConfigurationNotConsumableException;
 import org.gradle.util.GUtil;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class LocalComponentDependencyMetadata implements LocalOriginDependencyMetadata {
     private final ComponentIdentifier componentId;
@@ -224,7 +227,22 @@ public class LocalComponentDependencyMetadata implements LocalOriginDependencyMe
     }
 
     private LocalOriginDependencyMetadata copyWithTarget(ComponentSelector selector) {
-        return new LocalComponentDependencyMetadata(componentId, selector, moduleConfiguration, moduleAttributes, dependencyAttributes, dependencyConfiguration, artifactNames, excludes, force, changing, transitive, constraint, fromLock, reason);
+        return new LocalComponentDependencyMetadata(componentId, selector, moduleConfiguration, moduleAttributes, dependencyAttributes, dependencyConfiguration, newArtifactNames(selector,artifactNames), excludes, force, changing, transitive, constraint, fromLock, reason);
+    }
+
+    private List<IvyArtifactName> newArtifactNames(ComponentSelector selector, List<IvyArtifactName> artifactNames) {
+        List<IvyArtifactName> names = new ArrayList<>();
+        artifactNames.forEach(new Consumer<IvyArtifactName>() {
+            @Override
+            public void accept(IvyArtifactName ivyArtifactName) {
+                DefaultIvyArtifactName defaultIvyArtifactName = null;
+                if (selector instanceof ModuleComponentSelector) {
+                     defaultIvyArtifactName = new DefaultIvyArtifactName(((ModuleComponentSelector) selector).getModule(), ivyArtifactName.getType(), ivyArtifactName.getExtension(), ivyArtifactName.getClassifier());
+                }
+                names.add(defaultIvyArtifactName);
+            }
+        });
+        return names;
     }
 
     private LocalOriginDependencyMetadata copyWithReason(String reason) {

@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Set;
 
 public class DefaultBuildCacheConfiguration implements BuildCacheConfigurationInternal {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultBuildCacheConfiguration.class);
 
     private final Instantiator instantiator;

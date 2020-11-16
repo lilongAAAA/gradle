@@ -27,7 +27,7 @@ import org.gradle.internal.action.InstantiatingAction;
  * for example. This means that the result of executing the rule is not necessarily the same as the
  * details object. It must be possible for the consumer (the object which executes the rule) to reproduce
  * the result of executing the rule from the {@link RESULT} object.
- *
+ *Ma
  * The cache key consists of the provided key and the rule. This means that if the implementation of the
  * rule changes, or that its configuration changes, then we will have a cache miss.
  *
