@@ -423,7 +423,8 @@ def userguideMultiPage = tasks.register("userguideMultiPage", CacheableAsciidoct
 
 // Avoid overlapping outputs by copying exactly what we want from other intermediate tasks
 def userguide = tasks.register("userguide", Sync) {
-    dependsOn userguideMultiPage, userguideSinglePage
+    dependsOn userguideMultiPage
+
     description = 'Generates the userguide HTML and PDF'
     group = 'documentation'
 
